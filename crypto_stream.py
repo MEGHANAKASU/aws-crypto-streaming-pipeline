@@ -4,43 +4,60 @@ from datetime import datetime
 
 # Coinbase public WebSocket feed (no API key needed)
 WS_URL = "wss://ws-feed.exchange.coinbase.com"
-
-# Which crypto products to watch
 PRODUCTS = ["BTC-USD", "ETH-USD"]
+
+# Counter to track how many trades we've processed
+trade_count = 0
+
+
+def process_trade(trade: dict):
+    """
+    Central place where each trade is handled.
+    Right now it prints. LATER: this is where we'll send to Kinesis
+    (just one line changes — everything else stays the same).
+    """
+    global trade_count
+    trade_count += 1
+
+    # Print a status line every 50 trades so we don't flood the screen
+    if trade_count % 50 == 0:
+        print(f"  ...processed {trade_count} trades so far "
+              f"(latest: {trade['product']} ${trade['price']})")
 
 
 def on_open(ws):
-    """Runs when the connection opens — we subscribe to the trade feed."""
     print("✅ Connected to Coinbase. Subscribing to live trades...\n")
     subscribe_message = {
         "type": "subscribe",
         "product_ids": PRODUCTS,
-        "channels": ["matches"]   # 'matches' = completed trades
+        "channels": ["matches"]
     }
     ws.send(json.dumps(subscribe_message))
 
 
 def on_message(ws, message):
-    """Runs every time a new message arrives from Coinbase."""
     data = json.loads(message)
 
-    # 'match' messages are actual completed trades
     if data.get("type") == "match":
-        product = data.get("product_id")
-        price = data.get("price")
-        size = data.get("size")
-        side = data.get("side")
-        time = data.get("time", "")
-
-        print(f"[{time}] {product} | {side.upper():4} | price: ${price} | size: {size}")
+        # Build a clean, structured record — this is the shape we'll send to Kinesis
+        trade = {
+            "trade_id": data.get("trade_id"),
+            "product": data.get("product_id"),
+            "side": data.get("side"),
+            "price": data.get("price"),
+            "size": data.get("size"),
+            "timestamp": data.get("time"),
+        }
+        process_trade(trade)
 
 
 def on_error(ws, error):
-    print(f"❌ Error: {error}")
+    if error:
+        print(f"❌ Error: {error}")
 
 
 def on_close(ws, close_status_code, close_msg):
-    print("\n🔌 Connection closed.")
+    print(f"\n🔌 Connection closed. Total trades processed: {trade_count}")
 
 
 if __name__ == "__main__":
