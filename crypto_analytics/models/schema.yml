@@ -1,0 +1,95 @@
+version: 2
+
+models:
+  - name: stg_trades
+    description: >
+      Cleaned, typed trade records from the raw S3 data lake.
+      One row per individual trade from the Coinbase WebSocket feed.
+    columns:
+      - name: trade_id
+        description: Unique identifier for each trade from the exchange.
+        tests:
+          - unique
+          - not_null
+
+      - name: product
+        description: The trading pair (e.g. BTC-USD, ETH-USD).
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['BTC-USD', 'ETH-USD']
+
+      - name: side
+        description: Whether the trade was a buy or a sell.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['buy', 'sell']
+
+      - name: price
+        description: Execution price of the trade, in USD.
+        tests:
+          - not_null
+
+      - name: size
+        description: Quantity of the asset traded.
+        tests:
+          - not_null
+
+      - name: traded_at
+        description: Timestamp when the trade executed on the exchange.
+        tests:
+          - not_null
+
+      - name: trade_value
+        description: Derived — the USD value of the trade (price × size).
+
+  - name: fct_ohlc
+    description: >
+      OHLC candles aggregated per product, per minute.
+      The standard format used for candlestick charts and price analysis.
+    columns:
+      - name: product
+        description: The trading pair.
+        tests:
+          - not_null
+
+      - name: candle_minute
+        description: The minute-level time window this candle summarises.
+        tests:
+          - not_null
+
+      - name: open_price
+        description: First trade price within the minute.
+        tests:
+          - not_null
+
+      - name: high_price
+        description: Highest trade price within the minute.
+        tests:
+          - not_null
+
+      - name: low_price
+        description: Lowest trade price within the minute.
+        tests:
+          - not_null
+
+      - name: close_price
+        description: Last trade price within the minute.
+        tests:
+          - not_null
+
+      - name: volume
+        description: Total quantity traded within the minute.
+
+      - name: traded_value_usd
+        description: Total USD value traded within the minute.
+
+      - name: trade_count
+        description: Number of individual trades within the minute.
+
+      - name: price_change
+        description: Derived — close price minus open price.
+
+      - name: price_change_pct
+        description: Derived — percentage price change within the minute.
