@@ -6,3 +6,10 @@ __pycache__/
 *.csv
 data/
 dbt-venv/
+*.pkg
+*.zip
+logs/
+crypto_analytics/target/
+crypto_analytics/dbt_packages/
+crypto_analytics/logs/
+*.duckdb
