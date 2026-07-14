@@ -1,0 +1,31 @@
+[0m16:31:00.071163 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107f7d2b0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x1094179d0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x109417890>]}
+
+
+============================== 16:31:00.075696 | 677d1dc6-b281-49b9-86d2-69bc55514a11 ==============================
+[0m16:31:00.075696 [info ] [MainThread]: Running with dbt=1.11.12
+[0m16:31:00.076372 [debug] [MainThread]: running dbt with arguments {'invocation_command': 'dbt init crypto_analytics', 'version_check': 'True', 'printer_width': '80', 'static_parser': 'True', 'use_colors': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'log_path': 'logs', 'partial_parse': 'True', 'log_cache_events': 'False', 'log_format': 'default', 'quiet': 'False', 'send_anonymous_usage_stats': 'True', 'use_experimental_parser': 'False', 'empty': 'None', 'warn_error': 'None', 'no_print': 'None', 'profiles_dir': '/Users/meghanakasu/.dbt', 'cache_selected_only': 'False', 'debug': 'False', 'introspect': 'True', 'fail_fast': 'False', 'target_path': 'None', 'write_json': 'True', 'indirect_selection': 'eager'}
+[0m16:31:00.086819 [info ] [MainThread]: Creating dbt configuration folder at /Users/meghanakasu/.dbt
+[0m16:31:00.088021 [debug] [MainThread]: Starter project path: /Users/meghanakasu/ETLPROJECT_MEGHANAKASU/aws-streaming-pipeline/dbt-venv/lib/python3.13/site-packages/dbt/include/starter_project
+[0m16:31:00.094152 [info ] [MainThread]: 
+Your new dbt project "crypto_analytics" was created!
+
+For more information on how to configure the profiles.yml file,
+please consult the dbt documentation here:
+
+  https://docs.getdbt.com/docs/configure-your-profile
+
+One more thing:
+
+Need help? Don't hesitate to reach out to us via GitHub issues or on Slack:
+
+  https://community.getdbt.com/
+
+Happy modeling!
+
+[0m16:31:00.094658 [info ] [MainThread]: Setting up your profile.
+[0m16:33:34.886198 [info ] [MainThread]: Profile crypto_analytics written to /Users/meghanakasu/.dbt/profiles.yml using target's sample configuration. Once updated, you'll be able to start developing with dbt.
+[0m16:33:34.990009 [debug] [MainThread]: Resource report: {"command_name": "init", "command_success": true, "command_wall_clock_time": 154.9875, "process_in_blocks": "0", "process_kernel_time": 0.205903, "process_mem_max_rss": "128073728", "process_out_blocks": "0", "process_user_time": 1.083771}
+[0m16:33:34.990515 [debug] [MainThread]: Command `dbt init` succeeded at 16:33:34.990431 after 154.99 seconds
+[0m16:33:34.990801 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x109441f30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x107f33890>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x109520d10>]}
+[0m16:33:34.991106 [debug] [MainThread]: Flushing usage events
+[0m16:33:35.117967 [debug] [MainThread]: An error was encountered while trying to flush usage events
