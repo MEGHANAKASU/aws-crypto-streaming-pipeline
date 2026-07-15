@@ -1,36 +1,45 @@
-# Real-Time Crypto Streaming Pipeline (AWS)
+# Real-Time Crypto Streaming Pipeline
 
-A real-time streaming data pipeline that ingests live cryptocurrency trades and processes them through an AWS-based data stack.
+An end-to-end streaming data pipeline that ingests live cryptocurrency trades from Coinbase, processes them through AWS, transforms them with dbt, and serves them in an interactive analytics dashboard.
 
-> ⚠️ **Work in progress** — building in the open, one stage at a time.
+Built to close three gaps in a batch-and-GCP-heavy portfolio: real-time streaming, AWS, and the modern data stack.
+
+![Dashboard](docs/dashboard.png)
 
 ## Architecture
 
-Live Market Data (WebSocket) → AWS Kinesis → AWS Lambda → Amazon S3 (Data Lake) → dbt → Warehouse → Dashboard
+Coinbase WebSocket → AWS Kinesis → AWS Lambda → Amazon S3 → dbt → DuckDB → Streamlit
 
-## Current Status
+| Stage | Service | What it does |
+|---|---|---|
+| Source | Coinbase WebSocket | Streams every BTC-USD and ETH-USD trade as it executes |
+| Ingest | AWS Kinesis Data Streams | Buffers the live stream; producer sends batched put_records |
+| Process | AWS Lambda | Triggered by Kinesis; batches records and writes to the lake |
+| Lake | Amazon S3 | Raw newline-delimited JSON, partitioned by date |
+| Transform | dbt | Staging to marts, with data tests and lineage docs |
+| Warehouse | DuckDB | Queries the transformed marts |
+| Serve | Streamlit + Plotly | OHLC candles, volume, order flow, moving average |
 
-- ✅ Live crypto trade feed (Coinbase WebSocket) streaming in real time
-- ⏳ Kinesis ingestion (in progress)
-- ⏳ Lambda → S3 data lake
-- ⏳ dbt transformations
-- ⏳ Warehouse + dashboard
+## Data models
 
-## Tech Stack
+stg_trades — cleaned, typed trades. Casts price and size to numeric, parses timestamps, derives trade_value, filters null records.
 
-- **Language:** Python
-- **Streaming:** AWS Kinesis Data Streams
-- **Processing:** AWS Lambda
-- **Storage:** Amazon S3
-- **Transformation:** dbt
-- **Warehouse:** DuckDB / Amazon Redshift
-- **Data Source:** Coinbase public WebSocket API
+fct_ohlc — OHLC candles per product, per minute: open, high, low, close, volume, USD value, trade count, price change.
 
-## Data Source
+15 data quality tests, all passing — uniqueness on trade_id, not-null constraints, accepted-values on product and side.
 
-Live BTC-USD and ETH-USD trades from the Coinbase exchange WebSocket feed — real market data, no API key required.
+## Engineering notes
+
+Batched producer. The first version called put_record once per trade. Under a live firehose (~1,500 trades/minute) this was slow enough that Coinbase repeatedly dropped the connection as a slow consumer, killing collection after 2-3 minutes. Switching to batched put_records (100 per call) plus auto-reconnect fixed it — runs now stream continuously.
+
+Cost discipline. Kinesis bills per shard-hour, so the stream is created at the start of a run and deleted afterward. S3 and Lambda stay within free-tier limits. A zero-spend budget alarm guards the account.
+
+Partitioning. Lambda writes to date-partitioned S3 keys so queries scan only what they need.
+
+## Stack
+
+Python · AWS Kinesis · AWS Lambda · Amazon S3 · IAM · dbt · DuckDB · Streamlit · Plotly
 
 ## Author
 
-**Meghana Kasu** — Data Engineer
-GitHub: [github.com/MEGHANAKASU](https://github.com/MEGHANAKASU)
+Meghana Kasu — github.com/MEGHANAKASU
